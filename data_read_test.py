@@ -1,12 +1,15 @@
 import struct
 import os
+import numpy
+import matplotlib.pyplot as plt
+import pandas as pd
 
-/**
- 通达信历史日线格式
-    0      1      2      3      4      5        6      7
- integer float  float  float  float  float   integer float
- 日期     开盘价  最高价  最低价  收盘价   成交额   成交量   保留
-*/
+#############################################################
+# TDX Day Line Data Format                                  #
+#    0      1      2      3      4      5        6      7   #
+# integer float  float  float  float  float   integer float #
+#  Date    Open  High   Low     Close  Amount  Volume resv  #
+#############################################################
 def unpack_tdx(filename):
     f = open(filename,"rb")
     size = os.path.getsize(filename)
@@ -18,3 +21,13 @@ def unpack_tdx(filename):
 
 al = unpack_tdx("data.day/f/29#AL8.day")
 ml = unpack_tdx("data.day/f/29#ML8.day")
+
+diff = list()
+date = list()
+for i in range(len(al)):
+    diff.append(al[i][4]-ml[i][4])
+    date.append(al[i][0])
+
+ts = pd.Series(diff,index=date)
+ts.cumsum()
+ts.plot()
